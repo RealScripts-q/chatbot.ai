@@ -90,7 +90,7 @@
         output.innerHTML = "Sorry, there was an error loading the memory. Please try again later.";
       });
 
-    // Common phrase mapping to combine
+    // Common phrase mapping to combine responses
     const commonPhrases = {
       "hi": "Hello! How are you?",
       "how are you": "I am just an AI, but I'm doing great! How about you?",
@@ -107,12 +107,15 @@
         return;
       }
 
-      // Check for common phrases and combine responses
-      const combinedResponse = Object.keys(commonPhrases).find(phrase => input.includes(phrase));
-      
-      if (combinedResponse) {
-        output.innerText = commonPhrases[combinedResponse];
+      // Check if the user input contains both "hi" and "how are you"
+      if (input.includes("hi") && input.includes("how are you")) {
+        // Combine the greeting and the feeling response
+        output.innerText = "Hello! How are you? I am just an AI, but I'm doing great! How about you?";
+      } else if (commonPhrases[input]) {
+        // If the input matches any common phrase, output the response
+        output.innerText = commonPhrases[input];
       } else {
+        // If no common phrase matches, check for saved memory or ask for a new response
         if (memory[input]) {
           output.innerText = memory[input];
         } else {
