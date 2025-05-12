@@ -90,6 +90,14 @@
         output.innerHTML = "Sorry, there was an error loading the memory. Please try again later.";
       });
 
+    // Common phrase mapping to combine
+    const commonPhrases = {
+      "hi": "Hello! How are you?",
+      "how are you": "I am just an AI, but I'm doing great! How about you?",
+      "hello how are you": "Hi there! I'm just an AI, but I'm doing great! How about you?",
+      "what is your name": "I am your friendly AI bot, here to assist you!",
+    };
+
     function talk() {
       const inputBox = document.getElementById("userInput");
       const input = inputBox.value.trim().toLowerCase();
@@ -99,21 +107,28 @@
         return;
       }
 
-      if (memory[input]) {
-        output.innerText = memory[input];
+      // Check for common phrases and combine responses
+      const combinedResponse = Object.keys(commonPhrases).find(phrase => input.includes(phrase));
+      
+      if (combinedResponse) {
+        output.innerText = commonPhrases[combinedResponse];
       } else {
-        const reply = prompt("I don't know how to respond. What should I say?");
-        if (reply) {
-          memory[input] = reply;
-
-          // Save only the new/learned entries
-          const updatedLearnedMemory = JSON.parse(localStorage.getItem("ai_memory")) || {};
-          updatedLearnedMemory[input] = reply;
-          localStorage.setItem("ai_memory", JSON.stringify(updatedLearnedMemory));
-
-          output.innerText = reply;
+        if (memory[input]) {
+          output.innerText = memory[input];
         } else {
-          output.innerText = "Okay, maybe next time.";
+          const reply = prompt("I don't know how to respond. What should I say?");
+          if (reply) {
+            memory[input] = reply;
+
+            // Save only the new/learned entries
+            const updatedLearnedMemory = JSON.parse(localStorage.getItem("ai_memory")) || {};
+            updatedLearnedMemory[input] = reply;
+            localStorage.setItem("ai_memory", JSON.stringify(updatedLearnedMemory));
+
+            output.innerText = reply;
+          } else {
+            output.innerText = "Okay, maybe next time.";
+          }
         }
       }
 
