@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>AI Bot with JSON Memory</title>
+  <title>AI Bot with Learning & Multiple Responses</title>
   <style>
     body {
       background: #1b1b1b;
@@ -61,18 +61,23 @@
       }
 
       if (memory[input]) {
-        output.innerText = memory[input];
+        // Choose a random response from the list of possible answers
+        const responses = memory[input];
+        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+        output.innerText = randomResponse;
       } else {
-        const reply = prompt("I don't know how to respond. What should I say?");
-        if (reply) {
-          memory[input] = reply;
+        // Let the user teach the bot multiple responses
+        const newResponses = prompt("I don't know how to respond. Teach me! Separate different responses with commas (e.g., hi, hello, greetings):");
+        if (newResponses) {
+          const responseList = newResponses.split(",").map(response => response.trim());
+          memory[input] = responseList;
 
-          // Save only the new/learned entries
+          // Save new responses to localStorage
           const updatedLearnedMemory = JSON.parse(localStorage.getItem("ai_memory")) || {};
-          updatedLearnedMemory[input] = reply;
+          updatedLearnedMemory[input] = responseList;
           localStorage.setItem("ai_memory", JSON.stringify(updatedLearnedMemory));
 
-          output.innerText = reply;
+          output.innerText = `Thanks for teaching me! I learned: ${responseList.join(", ")}`;
         } else {
           output.innerText = "Okay, maybe next time.";
         }
