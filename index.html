@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Bot with JSON Memory</title>
   <style>
     body {
@@ -10,22 +11,50 @@
       font-family: Arial, sans-serif;
       text-align: center;
       padding-top: 50px;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    h1 {
+      font-size: 2em;
     }
     input, button {
-      padding: 10px;
+      padding: 12px;
       font-size: 18px;
-      border-radius: 5px;
+      border-radius: 8px;
       margin: 10px;
-      border: none;
-    }
-    input {
+      border: 1px solid #444;
       width: 300px;
+      background: #2a2a2a;
+      color: white;
+    }
+    button {
+      background: #4CAF50;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    input:focus, button:focus {
+      outline: none;
+      box-shadow: 0 0 10px #4CAF50;
     }
     #response {
       margin-top: 20px;
       font-size: 20px;
       max-width: 500px;
       margin-inline: auto;
+      line-height: 1.5;
+      padding: 15px;
+      background-color: #333;
+      border-radius: 8px;
+    }
+    .loading {
+      font-style: italic;
+      color: #999;
     }
   </style>
 </head>
@@ -39,6 +68,10 @@
     let defaultMemory = {};
     let memory = {};
 
+    // Show loading text while memory is being fetched
+    const output = document.getElementById("response");
+    output.innerHTML = "<span class='loading'>Loading memory...</span>";
+
     // Load default memory from external ai_memory.json
     fetch('ai_memory.json')
       .then(response => response.json())
@@ -48,12 +81,18 @@
         // Load learned memory from localStorage (if any), or use default
         const learnedMemory = JSON.parse(localStorage.getItem("ai_memory")) || {};
         memory = { ...defaultMemory, ...learnedMemory };
+
+        // Once data is loaded, remove loading text
+        output.innerHTML = "I'm ready to chat!";
+      })
+      .catch(error => {
+        console.error("Error loading memory:", error);
+        output.innerHTML = "Sorry, there was an error loading the memory. Please try again later.";
       });
 
     function talk() {
       const inputBox = document.getElementById("userInput");
       const input = inputBox.value.trim().toLowerCase();
-      const output = document.getElementById("response");
 
       if (!input) {
         output.innerText = "Please type something.";
