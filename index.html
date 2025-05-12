@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Bot with JSON Memory</title>
+  <style>
+    body {
+      background: #1b1b1b;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 50px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 18px;
+      border-radius: 5px;
+      margin: 10px;
+      border: none;
+    }
+    input {
+      width: 300px;
+    }
+    #response {
+      margin-top: 20px;
+      font-size: 20px;
+      max-width: 500px;
+      margin-inline: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧠 AI Bot</h1>
+  <input id="userInput" placeholder="Type something..." />
+  <button onclick="talk()">Talk</button>
+  <p id="response">I'm ready to chat!</p>
+
+  <script>
+    let defaultMemory = {};
+    let memory = {};
+
+    // Load default memory from external ai_memory.json
+    fetch('ai_memory.json')
+      .then(response => response.json())
+      .then(data => {
+        defaultMemory = data;
+
+        // Load learned memory from localStorage (if any), or use default
+        const learnedMemory = JSON.parse(localStorage.getItem("ai_memory")) || {};
+        memory = { ...defaultMemory, ...learnedMemory };
+      });
+
+    function talk() {
+      const inputBox = document.getElementById("userInput");
+      const input = inputBox.value.trim().toLowerCase();
+      const output = document.getElementById("response");
+
+      if (!input) {
+        output.innerText = "Please type something.";
+        return;
+      }
+
+      if (memory[input]) {
+        output.innerText = memory[input];
+      } else {
+        const reply = prompt("I don't know how to respond. What should I say?");
+        if (reply) {
+          memory[input] = reply;
+
+          // Save only the new/learned entries
+          const updatedLearnedMemory = JSON.parse(localStorage.getItem("ai_memory")) || {};
+          updatedLearnedMemory[input] = reply;
+          localStorage.setItem("ai_memory", JSON.stringify(updatedLearnedMemory));
+
+          output.innerText = reply;
+        } else {
+          output.innerText = "Okay, maybe next time.";
+        }
+      }
+
+      inputBox.value = "";
+    }
+  </script>
+</body>
+</html>
